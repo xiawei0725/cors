@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>web app</title>
+    <style>
+      section {
+        padding: 30px;
+      }
+      .content {
+        background-color: #ccc;
+        padding: 20px;
+        margin: 10px;
+        white-space: pre-line;
+      }
+    </style>
+    <script src="https://cdn.bootcdn.net/ajax/libs/js-xss/0.3.3/xss.min.js"></script>
+  </head>
+  <body>
+    <ul>
+      <li>
+        <h2>跨域</h2>
+        <ul>
+          <li><a href="#jsonp">JSONP</a></li>
+          <li><a href="#cors">CORS</a></li>
+        </ul>
+      </li>
+      <li>
+        <h2>表单文件上传</h2>
+        <ul>
+          <li><a href="#form_upload">文件上传</a></li>
+        </ul>
+      </li>
+    </ul>
+
+    <section id="jsonp">
+      <h3>服务端返回</h3>
+
+      <div class="content content-server"></div>
+
+      <h3>客户端代码</h3>
+      <div class="content content-web"></div>
+      <script>
+        function jsonp(data) {
+          document.querySelector(".content-server").innerHTML =
+            "<code>" + JSON.stringify(data) + "</code>";
+        }
+      </script>
+      <script src="http://localhost:3000/jsonp?callback=jsonp"></script>
+      <script>
+        const tag = "script";
+        const html = filterXSS(`<${tag}>
+    function jsonp(data) {
+      document.querySelector(".content-server").innerHTML = "<code>" + JSON.stringify(data) + "</code>";
+    }
+</${tag}>
+<${tag} src="http://localhost:3000/jsonp?callback=jsonp"></${tag}>`);
+        document.querySelector(".content-web").innerHTML =
+          "<code>" + html + "</code>";
+      </script>
+    </section>
+    <hr />
+    <section id="cors">
+      <h3>cors</h3>
+
+      <div class="content">
+        <p>// 服务端：http://localhost:3000</p>
+        <code>
+          // 首先允许8080 跨域
+          res.setHeader("Access-Control-Allow-Origin","http://localhost:8080");
+          
+          // 允许复杂请求
+          res.setHeader("Access-Control-Allow-Methods","PUT,POST"); 
+          
+          // 复杂请求携带header参数
+          res.setHeader("Access-Control-Allow-Headers","Content-Type,token"); 
+          
+          // 允许跨域cookie 
+          res.setHeader('Access-Control-Allow-Credentials','true');
+        </code>
+        
+        <p>客户端：http://localhost:8080</p>
+      </div>
+
+      <button id="btn1" onclick="req1()">简单请求</button>
+      <button id="btn2" onclick="req2()">简单请求POST</button>
+      <button id="btn3" onclick="req3()">复杂请求PUT</button>
+      <button id="btn2" onclick="req4()">复杂携带token请求POST</button>
+      <button onclick="login()">登录</button>
+    </section>
+    <hr />
+
+    <section id="form_upload">
+      <h3>文件上传</h3>
+      <form
+        action="http://localhost:3000/upload_form"
+        method="POST"
+        enctype="multipart/form-data"
+      >
+        <input type="text" name="username" placeholder="请输入用户名" />
+        <input type="file" name="file" id="file" />
+        <button type="submit">submit</button>
+      </form>
+    </section>
+
+    <script src="https://unpkg.com/axios@0.21.1/dist/axios.min.js"></script>
+    <script>
+      axios.defaults.baseURL = "http://localhost:3000";
+      axios.defaults.withCredentials = true;
+      // 简单请求
+
+      function req1() {
+        axios
+          .get("/user")
+          .then((res) => {
+            console.log(res);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      }
+
+      // POST请求
+
+      function req2() {
+        axios
+          .post("/user/save", { name: "hello", age: 18 })
+          .then((res) => {
+            console.log(res);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      }
+
+      function req3() {
+        axios
+          .put(
+            "/user/edit",
+            { name: "hello", age: 18 },
+            {
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          )
+          .then((res) => {
+            console.log(res);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      }
+
+      function req4() {
+        axios
+          .post(
+            "/user/edit",
+            { name: "11111", age: 20 },
+            {
+              headers: {
+                "Content-Type": "application/json",
+                token: "123456",
+              },
+            }
+          )
+          .then((res) => {
+            console.log(res);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      }
+
+      function login() {
+        axios
+          .post(
+            "/login",
+            { username: "lucas" },
+            {
+              "Content-Type": "application/json",
+            }
+          )
+          .then((res) => {
+            console.log(res);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      }
+    </script>
+  </body>
+</html>
