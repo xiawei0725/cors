@@ -25,7 +25,7 @@
   - 搭建跨域环境
 
     为了模拟跨域我用`node`搭建了一个跨域的环境。代码仓库在这里。
-    github地址：
+    github地址：[原生实现跨域及文件上传](https://github.com/dhtwfn0725/cors)
 
     这里先说明一下`jsonp`
 
