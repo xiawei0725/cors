@@ -92,7 +92,7 @@
     <hr />
 
     <section id="form_upload">
-      <h3>文件上传</h3>
+      <h3>文件上传 表单提交</h3>
       <form
         action="http://localhost:3000/upload_form"
         method="POST"
@@ -101,6 +101,15 @@
         <input type="text" name="username" placeholder="请输入用户名" />
         <input type="file" name="file" id="file" />
         <button type="submit">submit</button>
+      </form>
+
+
+      <h3>文件上传 formdata提交</h3>
+      <form onsubmit="return false"
+      >
+        <input type="text" class="form_uname" placeholder="请输入用户名" />
+        <input type="file" class="form_file" name="file"  />
+        <button type="button" id="submit_btn">submit</button>
       </form>
     </section>
 
@@ -189,6 +198,23 @@
             console.log(err);
           });
       }
+
+
+
+      var formdataBtn = document.getElementById('submit_btn');
+      formdataBtn.addEventListener('click',function(){
+        var formdata = new FormData();
+        var uname = document.querySelector('.form_uname')
+        var file = document.querySelector('.form_file')
+        formdata.append('uname',uname.value);
+        formdata.append('file',file.files[0]);
+        console.log(file.files[0]);
+        axios.post('/upload_form',formdata).then(res=>{
+          console.log(res);
+        }).catch(err=>{
+          console.log(err);
+        })
+      })
     </script>
   </body>
 </html>

@@ -96,10 +96,69 @@
     ```
     
     跨域相关的东西基本上有这些就能满足日常开发了，实际上还会有一些`iframe`的项目，我这里就不做模拟了。
+
 ## 文件上传
 
-    文件上传这部分我实际上只做了后端，前端直接用了form表单的形式提交，实际上前端也可以采用formdata的形式上传，这里我就不做介绍了。
+    文件上传既可以通过form表单上传也可以通过formdata上传。
 
+- 服务端代码
+
+```javascript
+
+if (url === '/upload_form' && method === 'POST') {
+    const form = formidable({ multiples: true });
+    form.parse(req, (err, fields, files) => {
+        // todo 保存
+        res.writeHead(200, { 'content-type': 'application/json' });
+        res.end(JSON.stringify({ fields, files }, null, 2));
+    });
+    return;
+}
+
+
+```
+- 客户端代码
+```html
+<section id="form_upload">
+  <h3>文件上传 表单提交</h3>
+  <form
+    action="http://localhost:3000/upload_form"
+    method="POST"
+    enctype="multipart/form-data"
+  >
+    <input type="text" name="username" placeholder="请输入用户名" />
+    <input type="file" name="file" id="file" />
+    <button type="submit">submit</button>
+  </form>
+
+
+  <h3>文件上传 formdata提交</h3>
+  <form onsubmit="return false"
+  >
+    <input type="text" class="form_uname" placeholder="请输入用户名" />
+    <input type="file" class="form_file" name="file"  />
+    <button type="button" id="submit_btn">submit</button>
+  </form>
+</section>
+```
+- js 部分
+```javascript
+  var formdataBtn = document.getElementById('submit_btn');
+  formdataBtn.addEventListener('click',function(){
+    var formdata = new FormData();
+    var uname = document.querySelector('.form_uname')
+    var file = document.querySelector('.form_file')
+    formdata.append('uname',uname.value);
+    formdata.append('file',file.files[0]);
+    console.log(file.files[0]);
+    axios.post('/upload_form',formdata).then(res=>{
+      console.log(res);
+    }).catch(err=>{
+      console.log(err);
+    })
+  })
+```
+    
 ## 参考
 [跨源资源共享（CORS）](https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Access_control_CORS)
 

@@ -1,7 +1,7 @@
 const http = require('http');
 const formidable = require('formidable')
-const queryString = require('querystring');
-
+const fs = require('fs');
+const path = require('path')
 const server = http.createServer((req, res) => {
     const { url, method } = req;
     console.log(url, method);
@@ -32,11 +32,12 @@ const server = http.createServer((req, res) => {
         `)
     }
 
-
+   
 
     if (url === '/upload_form' && method === 'POST') {
         const form = formidable({ multiples: true });
         form.parse(req, (err, fields, files) => {
+            // todo 保存
             res.writeHead(200, { 'content-type': 'application/json' });
             res.end(JSON.stringify({ fields, files }, null, 2));
         });
